@@ -1,0 +1,17 @@
+{
+  "name": "Holy Bible – KJV",
+  "short_name": "KJV Bible",
+  "description": "Complete King James Version Bible – offline ready",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0e0c",
+  "theme_color": "#0f0e0c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='24' fill='%230f0e0c'/><text x='96' y='130' font-size='110' text-anchor='middle' fill='%23c9a84c'>✝</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
