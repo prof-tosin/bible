@@ -1,17 +1,19 @@
 {
-  "name": "Holy Bible – KJV",
-  "short_name": "KJV Bible",
-  "description": "Complete King James Version Bible – offline ready",
+  "name": "Bibeli Mimọ – KJV & Yoruba",
+  "short_name": "Bibeli",
+  "description": "Holy Bible – King James Version with Yoruba parallel text, red-letter edition",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f0e0c",
-  "theme_color": "#0f0e0c",
+  "background_color": "#0a0d14",
+  "theme_color": "#0a0d14",
   "orientation": "portrait-primary",
+  "categories": ["books", "education", "lifestyle"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='24' fill='%230f0e0c'/><text x='96' y='130' font-size='110' text-anchor='middle' fill='%23c9a84c'>✝</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
