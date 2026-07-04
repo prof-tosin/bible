@@ -3,1155 +3,1585 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#0f0e0c"/>
-<meta name="description" content="Complete King James Version Bible – read offline"/>
+<meta name="theme-color" id="theme-meta" content="#0a0d14"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-<meta name="apple-mobile-web-app-title" content="KJV Bible"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Bibeli"/>
 <link rel="manifest" href="manifest.json"/>
-<title>Holy Bible – KJV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>Bibeli Mimọ – KJV & Yoruba</title>
 <style>
-/* ── DESIGN TOKENS ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — 3 MODES
+   ══════════════════════════════════════════════════════════════ */
 :root {
-  --bg:        #0f0e0c;
-  --bg2:       #1a1815;
-  --bg3:       #242220;
-  --surface:   #2c2a27;
-  --border:    #3d3a35;
-  --gold:      #c9a84c;
-  --gold-dim:  #8a6e2e;
-  --gold-glow: rgba(201,168,76,0.12);
-  --text:      #e8e0d0;
-  --text-dim:  #9a9080;
-  --text-faint:#5a554d;
-  --red:       #c0392b;
-  --accent:    #4a7c59;
-
-  --font-serif: 'Georgia', 'Times New Roman', serif;
-  --font-sans:  system-ui, -apple-system, sans-serif;
-
-  --radius:    6px;
-  --sidebar-w: 280px;
-  --header-h:  56px;
+  /* Shared constants */
+  --crimson:       #c8341a;
+  --crimson-soft:  rgba(200,52,26,.12);
+  --brass:         #b8944a;
+  --brass-dim:     #7a5e28;
+  --brass-glow:    rgba(184,148,74,.14);
+  --font-display:  'Cormorant Garant', 'Georgia', serif;
+  --font-ui:       'Inter', system-ui, sans-serif;
+  --sidebar-w:     288px;
+  --hdr-h:         58px;
+  --radius:        8px;
+  --transition:    .22s ease;
 }
 
-/* ── RESET ────────────────────────────────────────────────────── */
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
-html,body { height:100%; overflow:hidden }
-body { background:var(--bg); color:var(--text); font-family:var(--font-sans);
-       -webkit-font-smoothing:antialiased }
-button { cursor:pointer; border:none; background:none; font:inherit; color:inherit }
-input  { font:inherit; color:inherit }
-a      { color:inherit; text-decoration:none }
-ul,ol  { list-style:none }
-::-webkit-scrollbar { width:4px }
-::-webkit-scrollbar-track { background:transparent }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px }
-::selection { background:var(--gold-glow); color:var(--gold) }
+/* DEFAULT (deep midnight blue) */
+:root, [data-mode="default"] {
+  --bg:            #0a0d14;
+  --bg2:           #111520;
+  --bg3:           #181d2c;
+  --surface:       #1e2438;
+  --border:        #2a3050;
+  --border-subtle: #1e2438;
+  --text:          #e8dfc8;
+  --text-dim:      #8a8fa8;
+  --text-faint:    #3d4260;
+  --text-yoruba:   #b0bbd4;
+  --hl-bg:         rgba(184,148,74,.1);
+  --hl-border:     rgba(184,148,74,.35);
+  --theme-icon:    '🌌';
+}
+/* NIGHT (deepest black) */
+[data-mode="night"] {
+  --bg:            #06070b;
+  --bg2:           #0d0f16;
+  --bg3:           #121520;
+  --surface:       #171b28;
+  --border:        #222840;
+  --border-subtle: #171b28;
+  --text:          #d4ccb8;
+  --text-dim:      #6a7090;
+  --text-faint:    #2e3250;
+  --text-yoruba:   #8898b8;
+  --hl-bg:         rgba(184,148,74,.08);
+  --hl-border:     rgba(184,148,74,.28);
+  --theme-icon:    '🌙';
+}
+/* DAY (warm parchment) */
+[data-mode="day"] {
+  --bg:            #f5efe0;
+  --bg2:           #ede5d0;
+  --bg3:           #e4dac2;
+  --surface:       #d8cfb6;
+  --border:        #c4b896;
+  --border-subtle: #d8cfb6;
+  --text:          #1e1a10;
+  --text-dim:      #5a5035;
+  --text-faint:    #a09070;
+  --text-yoruba:   #3d3520;
+  --hl-bg:         rgba(184,148,74,.15);
+  --hl-border:     rgba(140,100,30,.4);
+  --theme-icon:    '☀️';
+}
+[data-mode="day"] #theme-meta { content: '#f5efe0' }
 
-/* ── LAYOUT ───────────────────────────────────────────────────── */
-#app { display:flex; height:100vh; height:100dvh; overflow:hidden }
+/* ══════════════════════════════════════════════════════════════
+   RESET
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+html, body { height: 100%; overflow: hidden }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit }
+input  { font: inherit; color: inherit }
+::-webkit-scrollbar { width: 3px }
+::-webkit-scrollbar-track { background: transparent }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px }
+::selection { background: var(--brass-glow); color: var(--brass) }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important } }
 
-/* SIDEBAR */
+/* ══════════════════════════════════════════════════════════════
+   PROGRESS BAR
+   ══════════════════════════════════════════════════════════════ */
+#progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: transparent; z-index: 1000; pointer-events: none;
+}
+#progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--brass-dim), var(--brass), var(--crimson));
+  transition: width .1s linear;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT
+   ══════════════════════════════════════════════════════════════ */
+#app { display: flex; height: 100vh; height: 100dvh; overflow: hidden }
+
+/* ── SIDEBAR ────────────────────────────────────────────────── */
 #sidebar {
-  width:var(--sidebar-w);
-  flex-shrink:0;
-  background:var(--bg2);
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  transition:transform .3s ease;
-  z-index:200;
-}
-#sidebar-header {
-  height:var(--header-h);
-  display:flex;
-  align-items:center;
-  padding:0 16px;
-  border-bottom:1px solid var(--border);
-  gap:10px;
-  flex-shrink:0;
-}
-.cross-icon {
-  font-size:22px;
-  color:var(--gold);
-  line-height:1;
-}
-#sidebar-header h1 {
-  font-family:var(--font-serif);
-  font-size:15px;
-  font-weight:normal;
-  color:var(--gold);
-  letter-spacing:.04em;
-}
-#sidebar-header span {
-  font-size:10px;
-  color:var(--text-dim);
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  display:block;
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition), background var(--transition), border-color var(--transition);
+  z-index: 300;
 }
 
-/* TESTAMENT TABS */
-#testament-tabs {
-  display:flex;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
+/* Sidebar brand */
+#sb-brand {
+  height: var(--hdr-h);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
 }
-.tab-btn {
-  flex:1;
-  padding:9px 0;
-  font-size:11px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  border-bottom:2px solid transparent;
-  transition:color .2s,border-color .2s;
+.brand-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--brass-dim), var(--brass));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
-.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold) }
+#sb-brand h1 {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 600;
+  color: var(--text);
+  letter-spacing: .02em;
+  line-height: 1.1;
+}
+#sb-brand small {
+  font-size: 10px; color: var(--text-dim);
+  letter-spacing: .12em; text-transform: uppercase; display: block;
+}
 
-/* BOOK LIST */
-#book-list {
-  flex:1;
-  overflow-y:auto;
-  padding:6px 0;
+/* Testament toggle */
+#testament-bar {
+  display: flex;
+  margin: 10px 12px 6px;
+  background: var(--bg3);
+  border-radius: 20px;
+  padding: 3px;
+  flex-shrink: 0;
 }
+.t-tab {
+  flex: 1; padding: 6px 0;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-dim); border-radius: 16px;
+  transition: background var(--transition), color var(--transition);
+}
+.t-tab.on {
+  background: linear-gradient(135deg, var(--brass-dim), var(--brass));
+  color: var(--bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+/* Book search */
+#sb-filter-wrap {
+  padding: 6px 12px 8px;
+  flex-shrink: 0;
+}
+#sb-filter {
+  width: 100%; padding: 7px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12.5px; color: var(--text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+#sb-filter::placeholder { color: var(--text-faint) }
+#sb-filter:focus { border-color: var(--brass-dim) }
+
+/* Book list */
+#book-list { flex: 1; overflow-y: auto; padding: 2px 0 8px }
 .book-item {
-  display:flex;
-  align-items:center;
-  padding:9px 16px;
-  font-size:13.5px;
-  color:var(--text-dim);
-  cursor:pointer;
-  transition:background .15s, color .15s;
-  gap:10px;
-  border-left:3px solid transparent;
+  display: flex; align-items: center;
+  padding: 8px 18px;
+  font-size: 13px; color: var(--text-dim);
+  cursor: pointer; gap: 10px;
+  border-left: 3px solid transparent;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
 }
-.book-item:hover { background:var(--bg3); color:var(--text) }
-.book-item.active {
-  background:var(--gold-glow);
-  color:var(--gold);
-  border-left-color:var(--gold);
+.book-item:hover { background: var(--bg3); color: var(--text) }
+.book-item.on {
+  background: var(--brass-glow);
+  color: var(--brass);
+  border-left-color: var(--brass);
+  font-weight: 500;
 }
-.book-abbr {
-  font-size:10px;
-  color:var(--text-faint);
-  min-width:24px;
-  text-align:right;
-  font-variant-numeric:tabular-nums;
-}
+.bk-num { font-size: 10px; color: var(--text-faint); min-width: 20px; text-align: right }
 
-/* MAIN CONTENT */
-#main {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  min-width:0;
-}
+/* ── MAIN PANEL ─────────────────────────────────────────────── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0 }
 
-/* TOP BAR */
-#topbar {
-  height:var(--header-h);
-  display:flex;
-  align-items:center;
-  padding:0 16px;
-  border-bottom:1px solid var(--border);
-  gap:10px;
-  flex-shrink:0;
-  background:var(--bg2);
+/* Header */
+#hdr {
+  height: var(--hdr-h);
+  display: flex; align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  gap: 10px; flex-shrink: 0;
+  transition: background var(--transition), border-color var(--transition);
+  position: relative;
 }
 #menu-btn {
-  display:none;
-  font-size:20px;
-  color:var(--text-dim);
-  padding:4px;
+  display: none;
+  width: 36px; height: 36px;
+  align-items: center; justify-content: center;
+  border-radius: 6px; font-size: 18px; color: var(--text-dim);
+  transition: background var(--transition);
 }
-#location-display {
-  flex:1;
-  display:flex;
-  align-items:baseline;
-  gap:6px;
-  min-width:0;
+#menu-btn:hover { background: var(--bg3) }
+#loc {
+  flex: 1; display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden;
 }
-#current-book {
-  font-family:var(--font-serif);
-  font-size:16px;
-  color:var(--text);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+#loc-book {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--text);
 }
-#current-chap {
-  font-size:13px;
-  color:var(--text-dim);
-  white-space:nowrap;
+#loc-chap { font-size: 12px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0 }
+#hdr-actions { display: flex; align-items: center; gap: 3px; flex-shrink: 0 }
+
+/* Icon buttons */
+.ibtn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; font-size: 15px;
+  color: var(--text-dim);
+  transition: background var(--transition), color var(--transition);
+}
+.ibtn:hover { background: var(--bg3); color: var(--text) }
+.ibtn.lit { color: var(--brass) }
+
+/* Chapter nav strip */
+#chap-strip {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 8px 12px; gap: 4px;
+  overflow-x: auto; flex-shrink: 0;
+  scrollbar-width: none;
+  transition: background var(--transition), border-color var(--transition);
+}
+#chap-strip::-webkit-scrollbar { display: none }
+.cb {
+  min-width: 30px; height: 26px; padding: 0 5px;
+  border-radius: 5px; font-size: 11.5px; font-weight: 500;
+  color: var(--text-dim); flex-shrink: 0;
+  border: 1px solid transparent;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.cb:hover { background: var(--bg3); color: var(--text) }
+.cb.on {
+  background: var(--brass-glow);
+  color: var(--brass);
+  border-color: var(--brass-dim);
 }
 
-/* TOPBAR CONTROLS */
-#topbar-controls { display:flex; align-items:center; gap:4px; flex-shrink:0 }
-.icon-btn {
-  width:34px; height:34px;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:var(--radius);
-  color:var(--text-dim);
-  font-size:16px;
-  transition:background .15s, color .15s;
+/* Prev/Next arrows in strip */
+.nav-arrow {
+  font-size: 11px; color: var(--text-dim);
+  padding: 4px 8px; border-radius: 4px;
+  border: 1px solid var(--border); flex-shrink: 0;
+  transition: background var(--transition), color var(--transition);
 }
-.icon-btn:hover { background:var(--bg3); color:var(--text) }
-.icon-btn.active { color:var(--gold) }
+.nav-arrow:hover { background: var(--bg3); color: var(--text) }
+.nav-arrow:disabled { opacity: .3; pointer-events: none }
+#strip-sep { flex: 1 }
 
-/* CHAPTER NAV */
-#chapter-nav {
-  display:flex;
-  align-items:center;
-  padding:8px 16px;
-  gap:6px;
-  border-bottom:1px solid var(--border);
-  overflow-x:auto;
-  flex-shrink:0;
-  background:var(--bg2);
-  scrollbar-width:none;
-}
-#chapter-nav::-webkit-scrollbar { display:none }
-.chap-btn {
-  min-width:32px; height:28px;
-  border-radius:4px;
-  font-size:12px;
-  color:var(--text-dim);
-  padding:0 6px;
-  flex-shrink:0;
-  transition:background .15s,color .15s;
-  border:1px solid transparent;
-}
-.chap-btn:hover { background:var(--bg3); color:var(--text) }
-.chap-btn.active {
-  background:var(--gold-glow);
-  color:var(--gold);
-  border-color:var(--gold-dim);
-}
-
-/* READING AREA */
+/* ══════════════════════════════════════════════════════════════
+   READER
+   ══════════════════════════════════════════════════════════════ */
 #reader {
-  flex:1;
-  overflow-y:auto;
-  padding:28px 24px 60px;
-}
-#chapter-heading {
-  font-family:var(--font-serif);
-  font-size:11px;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  color:var(--gold-dim);
-  margin-bottom:22px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-#chapter-heading::after {
-  content:'';
-  flex:1;
-  height:1px;
-  background:var(--border);
-}
-.verse-row {
-  display:flex;
-  gap:12px;
-  padding:3px 0;
-  margin-bottom:2px;
-  border-radius:4px;
-  transition:background .15s;
-  cursor:pointer;
-}
-.verse-row:hover { background:var(--bg3) }
-.verse-row.highlighted { background:var(--gold-glow) }
-.verse-row.bookmarked .verse-text::after {
-  content:' 🔖';
-  font-size:11px;
-}
-.verse-num {
-  font-size:11px;
-  color:var(--gold-dim);
-  min-width:22px;
-  padding-top:3px;
-  text-align:right;
-  font-variant-numeric:tabular-nums;
-  flex-shrink:0;
-  user-select:none;
-}
-.verse-text {
-  font-family:var(--font-serif);
-  font-size:17px;
-  line-height:1.75;
-  color:var(--text);
-}
-.verse-text.red-letter .woj { color:#e05a4a }
-
-/* Red-letter words of Jesus (approximate — we tag in render) */
-.woj { /* applied dynamically */ }
-
-/* SEARCH PANEL */
-#search-panel {
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.7);
-  backdrop-filter:blur(4px);
-  z-index:500;
-  display:none;
-  align-items:flex-start;
-  justify-content:center;
-  padding:60px 16px 16px;
-}
-#search-panel.open { display:flex }
-#search-box {
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  width:100%;
-  max-width:560px;
-  display:flex;
-  flex-direction:column;
-  max-height:80vh;
-  overflow:hidden;
-}
-#search-input-wrap {
-  display:flex;
-  align-items:center;
-  padding:12px 14px;
-  gap:10px;
-  border-bottom:1px solid var(--border);
-}
-#search-input-wrap span { font-size:18px; color:var(--gold); flex-shrink:0 }
-#search-input {
-  flex:1;
-  background:none;
-  border:none;
-  outline:none;
-  font-size:16px;
-  color:var(--text);
-}
-#search-input::placeholder { color:var(--text-faint) }
-#search-close {
-  font-size:20px;
-  color:var(--text-dim);
-  flex-shrink:0;
-}
-#search-results {
-  overflow-y:auto;
-  flex:1;
-}
-.search-result {
-  padding:12px 16px;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-  transition:background .15s;
-}
-.search-result:hover { background:var(--bg3) }
-.search-ref {
-  font-size:11px;
-  letter-spacing:.06em;
-  color:var(--gold);
-  margin-bottom:4px;
-  text-transform:uppercase;
-}
-.search-snippet {
-  font-family:var(--font-serif);
-  font-size:14px;
-  line-height:1.5;
-  color:var(--text-dim);
-}
-.search-snippet mark {
-  background:var(--gold-glow);
-  color:var(--gold);
-  border-radius:2px;
-  padding:0 2px;
-}
-#search-status {
-  padding:14px 16px;
-  font-size:13px;
-  color:var(--text-dim);
-  text-align:center;
+  flex: 1; overflow-y: auto;
+  padding: 32px 28px 80px;
+  scroll-behavior: smooth;
 }
 
-/* BOOKMARKS PANEL */
-#bm-panel {
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.7);
-  backdrop-filter:blur(4px);
-  z-index:500;
-  display:none;
-  align-items:flex-start;
-  justify-content:center;
-  padding:60px 16px 16px;
+/* Drop-cap chapter heading */
+#chap-hero {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 32px;
 }
-#bm-panel.open { display:flex }
-#bm-box {
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  width:100%;
-  max-width:480px;
-  display:flex;
-  flex-direction:column;
-  max-height:75vh;
-  overflow:hidden;
+#chap-dropcap {
+  font-family: var(--font-display);
+  font-size: 72px; font-weight: 700; line-height: .85;
+  color: var(--brass);
+  opacity: .15;
+  flex-shrink: 0;
+  user-select: none;
+  letter-spacing: -.02em;
 }
-#bm-header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 16px;
-  border-bottom:1px solid var(--border);
+#chap-hero-text { flex: 1 }
+#chap-hero-book {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
 }
-#bm-header h2 {
-  font-family:var(--font-serif);
-  font-size:16px;
-  font-weight:normal;
-  color:var(--gold);
+#chap-hero-ref {
+  font-size: 11px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--text-dim);
+  margin-top: 4px;
 }
-#bm-list { overflow-y:auto; flex:1 }
+.hero-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--brass-dim), transparent);
+  margin-bottom: 28px;
+}
+
+/* Verse pair */
+.vpair {
+  margin-bottom: 20px;
+  border-radius: 6px;
+  transition: background var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.vpair:hover { background: var(--bg3) }
+.vpair.hl {
+  background: var(--hl-bg);
+  border-left: 3px solid var(--brass-dim);
+  padding-left: 10px;
+}
+.vpair.bm::before {
+  content: '🔖';
+  position: absolute; top: 4px; right: 6px;
+  font-size: 11px; opacity: .7;
+}
+
+/* English row */
+.en-row {
+  display: flex; gap: 12px;
+  padding: 4px 8px 2px;
+}
+.vnum {
+  font-size: 10px; font-weight: 600;
+  color: var(--brass); min-width: 22px;
+  padding-top: 5px; text-align: right;
+  flex-shrink: 0; user-select: none;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .03em;
+}
+.en-text {
+  font-family: var(--font-display);
+  font-size: 18px; line-height: 1.72;
+  color: var(--text);
+  transition: font-size var(--transition);
+}
+.en-text.jesus { color: var(--crimson) }
+
+/* Yoruba row */
+.yo-row {
+  display: flex; gap: 12px;
+  padding: 2px 8px 5px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.yo-spacer { min-width: 22px; flex-shrink: 0 }
+.yo-text {
+  font-family: var(--font-display);
+  font-size: 15px; line-height: 1.6;
+  font-style: italic;
+  color: var(--text-yoruba);
+  transition: font-size var(--transition), color var(--transition);
+}
+/* Gilded divider between verses */
+.yo-row { position: relative }
+
+/* Red-letter styling */
+.en-text.jesus { color: var(--crimson) }
+[data-mode="day"] .en-text.jesus { color: #b02a13 }
+
+/* Yoruba-only / parallel layout toggle */
+body.parallel-mode .en-row,
+body.parallel-mode .yo-row { display: flex }
+body.yo-only .en-row { display: none }
+body.en-only .yo-row { display: none }
+
+/* Skeleton */
+.skel {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--surface) 50%, var(--bg3) 75%);
+  background-size: 200%; animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { 0% { background-position: 200% } 100% { background-position: -200% } }
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING PANELS
+   ══════════════════════════════════════════════════════════════ */
+/* Shared panel shell */
+.panel-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 600;
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 52px 14px 14px;
+}
+.panel-overlay.on { display: flex }
+.panel-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%; max-width: 580px;
+  display: flex; flex-direction: column;
+  max-height: 82vh; overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  transition: background var(--transition), border-color var(--transition);
+}
+.panel-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-hdr h2 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600; flex: 1;
+  color: var(--text);
+}
+.panel-close { font-size: 16px; color: var(--text-dim) }
+
+/* SEARCH */
+#sp-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+}
+#sp-input-wrap .search-icon { font-size: 16px; color: var(--brass); flex-shrink: 0 }
+#sp-in {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 16px; color: var(--text);
+}
+#sp-in::placeholder { color: var(--text-faint) }
+.scope-bar {
+  display: flex; gap: 5px; padding: 8px 14px;
+  border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none;
+}
+.scope-bar::-webkit-scrollbar { display: none }
+.scope-pill {
+  padding: 4px 11px; border-radius: 14px; font-size: 11px; font-weight: 500;
+  border: 1px solid var(--border); color: var(--text-dim); white-space: nowrap;
+  transition: all var(--transition);
+}
+.scope-pill.on {
+  background: var(--brass-glow); color: var(--brass); border-color: var(--brass-dim);
+}
+#sp-status { padding: 10px 16px; font-size: 12px; color: var(--text-dim); text-align: center }
+#sp-results { overflow-y: auto; flex: 1 }
+.sresult {
+  padding: 11px 16px; border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer; transition: background var(--transition);
+}
+.sresult:hover { background: var(--bg3) }
+.sresult-ref { font-size: 11px; color: var(--brass); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 3px }
+.sresult-en { font-family: var(--font-display); font-size: 14px; line-height: 1.5; color: var(--text-dim) }
+.sresult-en mark { background: var(--brass-glow); color: var(--brass); border-radius: 2px; padding: 0 2px }
+.sresult-yo { font-family: var(--font-display); font-size: 12px; font-style: italic; color: var(--text-faint); margin-top: 2px; line-height: 1.4 }
+
+/* BOOKMARKS */
 .bm-item {
-  display:flex;
-  align-items:center;
-  padding:11px 16px;
-  border-bottom:1px solid var(--border);
-  gap:10px;
-  cursor:pointer;
-  transition:background .15s;
+  display: flex; align-items: flex-start; padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle); cursor: pointer; gap: 12px;
+  transition: background var(--transition);
 }
-.bm-item:hover { background:var(--bg3) }
-.bm-ref {
-  flex:1;
-  font-size:13px;
-  color:var(--gold);
-  font-family:var(--font-serif);
-}
-.bm-text {
-  font-size:12px;
-  color:var(--text-dim);
-  flex:2;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.bm-del {
-  font-size:16px;
-  color:var(--text-faint);
-  padding:4px;
-  flex-shrink:0;
-}
-.bm-del:hover { color:var(--red) }
-#bm-empty {
-  padding:32px 16px;
-  text-align:center;
-  color:var(--text-faint);
-  font-size:14px;
-}
+.bm-item:hover { background: var(--bg3) }
+.bm-ref { font-size: 12px; color: var(--brass); font-weight: 600; white-space: nowrap; flex-shrink: 0; margin-top: 2px }
+.bm-body { flex: 1; min-width: 0 }
+.bm-en { font-family: var(--font-display); font-size: 13px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.bm-yo { font-family: var(--font-display); font-size: 12px; font-style: italic; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px }
+.bm-del { color: var(--text-faint); font-size: 14px; padding: 2px 4px; flex-shrink: 0; transition: color var(--transition) }
+.bm-del:hover { color: var(--crimson) }
+.panel-empty { padding: 32px; text-align: center; color: var(--text-faint); font-size: 14px; line-height: 1.6; font-family: var(--font-display) }
 
-/* FONT SIZE CONTROL */
-#font-panel {
-  position:absolute;
-  top:calc(var(--header-h) + 4px);
-  right:16px;
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:10px 14px;
-  display:none;
-  align-items:center;
-  gap:10px;
-  z-index:300;
-  box-shadow:0 8px 24px rgba(0,0,0,.5);
-}
-#font-panel.open { display:flex }
-#font-panel label { font-size:12px; color:var(--text-dim) }
-.fs-btn {
-  width:28px; height:28px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  font-size:16px;
-  color:var(--text);
-  display:flex; align-items:center; justify-content:center;
-  transition:background .15s;
-}
-.fs-btn:hover { background:var(--bg3) }
-#fs-val {
-  font-size:13px;
-  color:var(--gold);
-  min-width:28px;
-  text-align:center;
-}
+/* SETTINGS PANEL */
+#settings-box { max-width: 420px }
+.setting-group { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle) }
+.setting-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; font-weight: 500 }
 
-/* OVERLAY for mobile sidebar */
-#overlay {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  z-index:150;
+/* Mode switcher */
+.mode-row { display: flex; gap: 8px }
+.mode-card {
+  flex: 1; padding: 10px 8px;
+  border: 2px solid var(--border);
+  border-radius: 8px; cursor: pointer; text-align: center;
+  transition: all var(--transition);
 }
+.mode-card:hover { border-color: var(--brass-dim) }
+.mode-card.on { border-color: var(--brass); background: var(--brass-glow) }
+.mode-card .mode-icon { font-size: 20px; display: block; margin-bottom: 4px }
+.mode-card .mode-name { font-size: 11px; color: var(--text-dim); font-weight: 500 }
+.mode-card.on .mode-name { color: var(--brass) }
 
-/* LOADING / TOAST */
+/* Font size slider */
+.font-row { display: flex; align-items: center; gap: 12px }
+.font-dec, .font-inc {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  transition: background var(--transition);
+}
+.font-dec:hover, .font-inc:hover { background: var(--bg3) }
+#font-track {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--border); position: relative; cursor: pointer;
+}
+#font-fill { height: 100%; border-radius: 2px; background: var(--brass); transition: width var(--transition) }
+#font-val { font-size: 13px; color: var(--brass); min-width: 28px; text-align: center; font-weight: 600 }
+
+/* Display language */
+.lang-row { display: flex; gap: 8px }
+.lang-btn {
+  flex: 1; padding: 8px;
+  border: 2px solid var(--border); border-radius: 7px;
+  font-size: 12px; font-weight: 500; color: var(--text-dim);
+  transition: all var(--transition); cursor: pointer; text-align: center;
+}
+.lang-btn:hover { border-color: var(--brass-dim) }
+.lang-btn.on { border-color: var(--brass); color: var(--brass); background: var(--brass-glow) }
+
+/* VERSE CONTEXT MENU */
+#vmenu {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 5px 0;
+  z-index: 800; display: none;
+  min-width: 180px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.6);
+  transition: background var(--transition), border-color var(--transition);
+}
+#vmenu.on { display: block }
+.vmenu-ref {
+  padding: 8px 14px 6px;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--brass); border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 3px;
+}
+.vm-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 14px;
+  font-size: 13px; color: var(--text-dim); cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.vm-item:hover { background: var(--bg3); color: var(--text) }
+.vm-ico { width: 18px; text-align: center; font-size: 14px }
+
+/* ══════════════════════════════════════════════════════════════
+   DAILY VERSE SPLASH
+   ══════════════════════════════════════════════════════════════ */
+#daily-splash {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+  transition: opacity .4s;
+}
+#daily-splash.gone { opacity: 0; pointer-events: none }
+.splash-cross {
+  font-size: 28px; margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--brass-dim), var(--brass));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.splash-label {
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 20px; font-weight: 500;
+}
+#splash-verse-en {
+  font-family: var(--font-display);
+  font-size: 22px; line-height: 1.6;
+  color: var(--text); max-width: 480px; margin-bottom: 14px;
+}
+#splash-verse-yo {
+  font-family: var(--font-display);
+  font-size: 16px; font-style: italic; line-height: 1.5;
+  color: var(--text-yoruba); max-width: 440px; margin-bottom: 10px;
+}
+#splash-ref {
+  font-size: 12px; letter-spacing: .08em; color: var(--brass);
+  text-transform: uppercase; margin-bottom: 36px;
+}
+#splash-enter {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--brass-dim), var(--brass));
+  color: var(--bg); font-size: 14px; font-weight: 600;
+  border-radius: 24px; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(184,148,74,.3);
+  transition: transform .15s, box-shadow .15s;
+  letter-spacing: .04em;
+}
+#splash-enter:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184,148,74,.4) }
+.splash-date { font-size: 11px; color: var(--text-faint); margin-top: 16px }
+
+/* ══════════════════════════════════════════════════════════════
+   LOADING
+   ══════════════════════════════════════════════════════════════ */
 #loading {
-  position:fixed;
-  inset:0;
-  background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:16px;
-  z-index:1000;
-  transition:opacity .4s;
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 16px;
+  z-index: 900; transition: opacity .35s;
 }
-#loading.hidden { opacity:0; pointer-events:none }
-.spinner {
-  width:36px; height:36px;
-  border:2px solid var(--border);
-  border-top-color:var(--gold);
-  border-radius:50%;
-  animation:spin .8s linear infinite;
+#loading.gone { opacity: 0; pointer-events: none }
+.spin {
+  width: 36px; height: 36px;
+  border: 2px solid var(--border); border-top-color: var(--brass);
+  border-radius: 50%; animation: rot .85s linear infinite;
 }
-@keyframes spin { to { transform:rotate(360deg) } }
-#loading p { font-size:13px; color:var(--text-dim) }
+@keyframes rot { to { transform: rotate(360deg) } }
+#ld-msg { font-size: 13px; color: var(--text-dim) }
 
+/* ══════════════════════════════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════════════════════════════ */
 #toast {
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%) translateY(60px);
-  background:var(--surface);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:10px 18px;
-  border-radius:20px;
-  font-size:13px;
-  transition:transform .3s;
-  z-index:900;
-  white-space:nowrap;
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(56px);
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 18px;
+  border-radius: 22px; font-size: 13px;
+  transition: transform .28s; z-index: 850; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
-#toast.show { transform:translateX(-50%) translateY(0) }
+#toast.on { transform: translateX(-50%) translateY(0) }
 
-/* NAV ARROWS */
-#chapter-arrows {
-  display:flex;
-  gap:6px;
+/* Overlay */
+#overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); z-index: 250;
 }
-.arrow-btn {
-  font-size:13px;
-  color:var(--text-dim);
-  padding:4px 8px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  transition:background .15s, color .15s;
-}
-.arrow-btn:hover { background:var(--bg3); color:var(--text) }
-.arrow-btn:disabled { opacity:.3; pointer-events:none }
+#overlay.on { display: block }
 
-/* MOBILE ─────────────────────────────────────────────────────── */
-@media (max-width: 680px) {
+/* ══════════════════════════════════════════════════════════════
+   MOBILE
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 700px) {
   #sidebar {
-    position:fixed;
-    left:0; top:0; bottom:0;
-    transform:translateX(-100%);
+    position: fixed; left: 0; top: 0; bottom: 0;
+    transform: translateX(-100%);
   }
-  #sidebar.open { transform:translateX(0) }
-  #overlay { display:block }
-  #overlay.hidden { display:none }
-  #menu-btn { display:flex }
-  #reader { padding:20px 14px 60px }
-  .verse-text { font-size:16px }
-  #search-panel, #bm-panel { padding:20px 10px 10px }
+  #sidebar.on { transform: translateX(0) }
+  #menu-btn { display: flex !important }
+  #reader { padding: 20px 16px 72px }
+  .en-text { font-size: 17px }
+  .yo-text { font-size: 14px }
+  #chap-dropcap { font-size: 52px }
+  #chap-hero-book { font-size: 22px }
+  .panel-overlay { padding: 20px 10px 10px }
 }
 </style>
 </head>
-<body>
+<body data-mode="default">
 
+<!-- PROGRESS -->
+<div id="progress"><div id="progress-fill"></div></div>
+
+<!-- LOADING -->
 <div id="loading">
-  <div style="font-size:36px">✝</div>
-  <div class="spinner"></div>
-  <p id="loading-msg">Loading Holy Bible…</p>
+  <div class="brand-icon" style="width:44px;height:44px;font-size:22px">✝</div>
+  <div class="spin"></div>
+  <p id="ld-msg">Loading Bibeli Mimọ…</p>
 </div>
 
+<!-- DAILY VERSE SPLASH -->
+<div id="daily-splash">
+  <div class="splash-cross">✝</div>
+  <div class="splash-label">Verse of the Day</div>
+  <div id="splash-verse-en">…</div>
+  <div id="splash-verse-yo">…</div>
+  <div id="splash-ref">—</div>
+  <button id="splash-enter" onclick="enterApp()">Enter Bibeli ›</button>
+  <div class="splash-date" id="splash-date"></div>
+</div>
+
+<!-- APP -->
 <div id="app">
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
-    <div id="sidebar-header">
-      <span class="cross-icon">✝</span>
+    <div id="sb-brand">
+      <div class="brand-icon">✝</div>
       <div>
-        <h1>Holy Bible</h1>
-        <span>King James Version</span>
+        <h1>Bibeli Mimọ</h1>
+        <small>KJV · Yoruba · Red-Letter</small>
       </div>
     </div>
-    <div id="testament-tabs">
-      <button class="tab-btn active" data-t="OT" onclick="switchTestament('OT',this)">Old Testament</button>
-      <button class="tab-btn" data-t="NT" onclick="switchTestament('NT',this)">New Testament</button>
+    <div id="testament-bar">
+      <button class="t-tab on" data-t="OT" onclick="switchT('OT',this)">Majẹmu Lailai</button>
+      <button class="t-tab" data-t="NT" onclick="switchT('NT',this)">Majẹmu Tuntun</button>
+    </div>
+    <div id="sb-filter-wrap">
+      <input id="sb-filter" placeholder="Ṣe àwòṣe iwe / Filter books…" oninput="filterBooks(this.value)"/>
     </div>
     <div id="book-list"></div>
   </aside>
 
   <!-- MAIN -->
   <main id="main">
-    <div id="topbar">
-      <button id="menu-btn" class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
-      <div id="location-display">
-        <span id="current-book">—</span>
-        <span id="current-chap"></span>
+    <div id="hdr">
+      <button id="menu-btn" class="ibtn" onclick="toggleSidebar()" style="display:none">☰</button>
+      <div id="loc">
+        <span id="loc-book">—</span>
+        <span id="loc-chap"></span>
       </div>
-      <div id="topbar-controls">
-        <div id="chapter-arrows">
-          <button class="arrow-btn" id="prev-chap" onclick="changeChapter(-1)" aria-label="Previous chapter">◀</button>
-          <button class="arrow-btn" id="next-chap" onclick="changeChapter(1)" aria-label="Next chapter">▶</button>
-        </div>
-        <button class="icon-btn" onclick="openSearch()" title="Search" aria-label="Search">🔍</button>
-        <button class="icon-btn" id="bm-btn" onclick="openBookmarks()" title="Bookmarks" aria-label="Bookmarks">🔖</button>
-        <button class="icon-btn" onclick="toggleFontPanel()" title="Font size" aria-label="Font size">Aa</button>
+      <div id="hdr-actions">
+        <button class="nav-arrow" id="pa" onclick="shiftChap(-1)" disabled>◀</button>
+        <button class="nav-arrow" id="na" onclick="shiftChap(1)"  disabled>▶</button>
+        <button class="ibtn" onclick="openSearch()" title="Wa / Search (/)">🔍</button>
+        <button class="ibtn" onclick="openBM()" title="Bookmarks">🔖</button>
+        <button class="ibtn" onclick="openSettings()" title="Settings">⚙️</button>
       </div>
     </div>
 
-    <!-- FONT PANEL -->
-    <div id="font-panel">
-      <label>Text size</label>
-      <button class="fs-btn" onclick="changeFontSize(-1)">−</button>
-      <span id="fs-val">17</span>
-      <button class="fs-btn" onclick="changeFontSize(1)">+</button>
+    <div id="chap-strip">
+      <button class="nav-arrow" id="pa2" onclick="shiftChap(-1)" disabled>◀</button>
+      <div id="strip-btns" style="display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none"></div>
+      <button class="nav-arrow" id="na2" onclick="shiftChap(1)" disabled>▶</button>
     </div>
-
-    <div id="chapter-nav"></div>
 
     <div id="reader">
-      <div id="chapter-heading"></div>
+      <div id="chap-hero">
+        <div id="chap-dropcap">I</div>
+        <div id="chap-hero-text">
+          <div id="chap-hero-book">—</div>
+          <div id="chap-hero-ref">Chapter 1</div>
+        </div>
+      </div>
+      <div class="hero-rule"></div>
       <div id="verses"></div>
     </div>
   </main>
-
 </div>
 
 <!-- OVERLAY -->
-<div id="overlay" class="hidden" onclick="closeSidebar()"></div>
+<div id="overlay" onclick="closeSidebar(); closeVMenu()"></div>
 
-<!-- SEARCH PANEL -->
-<div id="search-panel" onclick="e=>{if(e.target===this)closeSearch()}">
-  <div id="search-box">
-    <div id="search-input-wrap">
-      <span>🔍</span>
-      <input id="search-input" placeholder="Search the scriptures…" autocomplete="off" spellcheck="false"/>
-      <button id="search-close" class="icon-btn" onclick="closeSearch()">✕</button>
+<!-- ── SEARCH ── -->
+<div id="sp" class="panel-overlay" onclick="if(event.target===this)closeSearch()">
+  <div class="panel-box" style="max-width:600px">
+    <div id="sp-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="sp-in" placeholder="Search the scriptures…" autocomplete="off" spellcheck="false"/>
+      <button class="ibtn panel-close" onclick="closeSearch()">✕</button>
     </div>
-    <div id="search-status"></div>
-    <div id="search-results"></div>
+    <div class="scope-bar">
+      <button class="scope-pill on" data-scope="all"  onclick="setScope(this)">All Bible</button>
+      <button class="scope-pill"    data-scope="OT"   onclick="setScope(this)">Old Testament</button>
+      <button class="scope-pill"    data-scope="NT"   onclick="setScope(this)">New Testament</button>
+      <button class="scope-pill"    data-scope="book" onclick="setScope(this)" id="scope-book-btn">This Book</button>
+    </div>
+    <div id="sp-status"></div>
+    <div id="sp-results"></div>
   </div>
 </div>
 
-<!-- BOOKMARKS PANEL -->
-<div id="bm-panel" onclick="e=>{if(e.target===this)closeBookmarks()}">
-  <div id="bm-box">
-    <div id="bm-header">
-      <h2>Bookmarks</h2>
-      <button class="icon-btn" onclick="closeBookmarks()">✕</button>
+<!-- ── BOOKMARKS ── -->
+<div id="bp" class="panel-overlay" onclick="if(event.target===this)closeBM()">
+  <div class="panel-box" style="max-width:500px">
+    <div class="panel-hdr">
+      <h2>🔖 Bookmarks</h2>
+      <button class="ibtn panel-close" onclick="closeBM()">✕</button>
     </div>
-    <div id="bm-list"></div>
+    <div id="bp-list" style="overflow-y:auto;flex:1"></div>
   </div>
+</div>
+
+<!-- ── SETTINGS ── -->
+<div id="settingsp" class="panel-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="panel-box" id="settings-box" style="max-width:400px">
+    <div class="panel-hdr">
+      <h2>⚙️ Settings</h2>
+      <button class="ibtn panel-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <!-- Theme Mode -->
+    <div class="setting-group">
+      <div class="setting-label">Reading Mode</div>
+      <div class="mode-row">
+        <button class="mode-card on" data-m="default" onclick="setMode('default',this)">
+          <span class="mode-icon">🌌</span>
+          <span class="mode-name">Default</span>
+        </button>
+        <button class="mode-card" data-m="night" onclick="setMode('night',this)">
+          <span class="mode-icon">🌙</span>
+          <span class="mode-name">Night</span>
+        </button>
+        <button class="mode-card" data-m="day" onclick="setMode('day',this)">
+          <span class="mode-icon">☀️</span>
+          <span class="mode-name">Day</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Font Size -->
+    <div class="setting-group">
+      <div class="setting-label">Text Size</div>
+      <div class="font-row">
+        <button class="font-dec" onclick="changeFont(-1)">−</button>
+        <div id="font-track" onclick="fontTrackClick(event)">
+          <div id="font-fill"></div>
+        </div>
+        <button class="font-inc" onclick="changeFont(1)">+</button>
+        <span id="font-val">18</span>
+      </div>
+    </div>
+
+    <!-- Language display -->
+    <div class="setting-group">
+      <div class="setting-label">Display Language</div>
+      <div class="lang-row">
+        <button class="lang-btn on" data-lang="both" onclick="setLang('both',this)">KJV + Yoruba</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en',this)">KJV Only</button>
+        <button class="lang-btn" data-lang="yo" onclick="setLang('yo',this)">Yoruba Only</button>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="setting-group" style="padding-bottom:18px">
+      <div class="setting-label">About</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.6">
+        <strong style="color:var(--text)">Bibeli Mimọ</strong><br/>
+        King James Version · Yoruba (Translated)<br/>
+        Red-letter edition — words of Jesus Christ<br/>
+        Works offline after first visit. Long-press any verse to bookmark it.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERSE CONTEXT MENU -->
+<div id="vmenu">
+  <div class="vmenu-ref" id="vmenu-ref">—</div>
+  <div class="vm-item" onclick="vmCopy()"><span class="vm-ico">📋</span> Copy verse</div>
+  <div class="vm-item" onclick="vmBM()"> <span class="vm-ico">🔖</span> <span id="vm-bm-lbl">Bookmark</span></div>
+  <div class="vm-item" onclick="vmHL()"> <span class="vm-ico">✨</span> <span id="vm-hl-lbl">Highlight</span></div>
+  <div class="vm-item" onclick="vmShare()"><span class="vm-ico">↗️</span> Share verse</div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────
-const BASE = 'https://raw.githubusercontent.com/aruljohn/Bible-kjv/master/';
+/* ══════════════════════════════════════════════════════════════
+   CONSTANTS
+   ══════════════════════════════════════════════════════════════ */
+const BASE_EN = 'https://raw.githubusercontent.com/aruljohn/Bible-kjv/master/';
+const YORUBA_URL = 'https://raw.githubusercontent.com/tayoraph/yoruba-Bible-in-json/main/verses.json';
+const REDLETTER_URL = 'https://raw.githubusercontent.com/jess7weatherby/bible-translations/master/red-letter-web.json';
 
-const OT_BOOKS = ["Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi"];
-const NT_BOOKS = ["Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"];
-const ALL_BOOKS = [...OT_BOOKS, ...NT_BOOKS];
+const OT = ["Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth",
+  "1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah",
+  "Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon","Isaiah","Jeremiah",
+  "Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah",
+  "Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi"];
+const NT = ["Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians",
+  "Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians",
+  "1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter",
+  "1 John","2 John","3 John","Jude","Revelation"];
+const ALL = [...OT, ...NT];
 
-// Abbreviations
-const ABBR = {
-  "Genesis":"Gen","Exodus":"Exo","Leviticus":"Lev","Numbers":"Num","Deuteronomy":"Deu",
-  "Joshua":"Jos","Judges":"Jdg","Ruth":"Rut","1 Samuel":"1Sa","2 Samuel":"2Sa",
-  "1 Kings":"1Ki","2 Kings":"2Ki","1 Chronicles":"1Ch","2 Chronicles":"2Ch",
-  "Ezra":"Ezr","Nehemiah":"Neh","Esther":"Est","Job":"Job","Psalms":"Psa",
-  "Proverbs":"Pro","Ecclesiastes":"Ecc","Song of Solomon":"SoS","Isaiah":"Isa",
-  "Jeremiah":"Jer","Lamentations":"Lam","Ezekiel":"Eze","Daniel":"Dan",
-  "Hosea":"Hos","Joel":"Joe","Amos":"Amo","Obadiah":"Oba","Jonah":"Jon",
-  "Micah":"Mic","Nahum":"Nah","Habakkuk":"Hab","Zephaniah":"Zep","Haggai":"Hag",
-  "Zechariah":"Zec","Malachi":"Mal","Matthew":"Mat","Mark":"Mar","Luke":"Luk",
-  "John":"Joh","Acts":"Act","Romans":"Rom","1 Corinthians":"1Co","2 Corinthians":"2Co",
-  "Galatians":"Gal","Ephesians":"Eph","Philippians":"Phi","Colossians":"Col",
-  "1 Thessalonians":"1Th","2 Thessalonians":"2Th","1 Timothy":"1Ti","2 Timothy":"2Ti",
-  "Titus":"Tit","Philemon":"Phm","Hebrews":"Heb","James":"Jam","1 Peter":"1Pe",
-  "2 Peter":"2Pe","1 John":"1Jo","2 John":"2Jo","3 John":"3Jo","Jude":"Jud",
-  "Revelation":"Rev"
+const CHAPS = {
+  Genesis:50,Exodus:40,Leviticus:27,Numbers:36,Deuteronomy:34,Joshua:24,Judges:21,
+  Ruth:4,"1 Samuel":31,"2 Samuel":24,"1 Kings":22,"2 Kings":25,"1 Chronicles":29,
+  "2 Chronicles":36,Ezra:10,Nehemiah:13,Esther:10,Job:42,Psalms:150,Proverbs:31,
+  Ecclesiastes:12,"Song of Solomon":8,Isaiah:66,Jeremiah:52,Lamentations:5,Ezekiel:48,
+  Daniel:12,Hosea:14,Joel:3,Amos:9,Obadiah:1,Jonah:4,Micah:7,Nahum:3,Habakkuk:3,
+  Zephaniah:3,Haggai:2,Zechariah:14,Malachi:4,Matthew:28,Mark:16,Luke:24,John:21,
+  Acts:28,Romans:16,"1 Corinthians":16,"2 Corinthians":13,Galatians:6,Ephesians:6,
+  Philippians:4,Colossians:4,"1 Thessalonians":5,"2 Thessalonians":3,"1 Timothy":6,
+  "2 Timothy":4,Titus:3,Philemon:1,Hebrews:13,James:5,"1 Peter":5,"2 Peter":3,
+  "1 John":5,"2 John":1,"3 John":1,Jude:1,Revelation:22
 };
 
-// ── STATE ─────────────────────────────────────────────────────
-let state = {
+// Yoruba book index mapping (same order as ALL)
+const YO_NAMES = [
+  "Gẹ́nẹ́sísì","Ékísódù","Léfítíkù","Numeri","Deuteronomi","Josua","Awọn Onidajọ",
+  "Ruutu","Samueli (Kinni)","Samueli (Keji)","Awon Ọba (Kinni)","Awon Ọba (Keji)",
+  "Kronika (Kinni)","Kronika (Keji)","Esra","Nehemiah","Esteri","Jobu","Psalmu",
+  "Òwe","Oniwasu","Orin Solomọni","Isaiah","Jeremiah","Ẹkún Jeremiah","Esekieli",
+  "Danieli","Hosea","Joeli","Amọsi","Obadiah","Jonà","Mika","Nahumu","Habakkuku",
+  "Sefaniah","Haggai","Sekariah","Malaki",
+  "Matteu","Marku","Luku","Johanu","Ise Awọn Aposteli","Awọn Ará Romu",
+  "Awọn Ará Korinti (Kinni)","Awọn Ará Korinti (Keji)","Awọn Ará Galatia",
+  "Awọn Ará Efesu","Awọn Ará Filippi","Awọn Ará Kolosse",
+  "Awọn Ará Tessalonika (Kinni)","Awọn Ará Tessalonika (Keji)",
+  "Timoteu (Kinni)","Timoteu (Keji)","Titu","Filimọni","Awọn Heberu","Jákọ́bù",
+  "Peteru (Kinni)","Peteru (Keji)","Johanu (Kinni)","Johanu (Keji)",
+  "Johanu (Kẹta)","Juda","Ifihan"
+];
+
+// Daily verse pool (ref: [bookIndex, chapter, verse])
+const DAILY_POOL = [
+  ["John",3,16],["Psalms",23,1],["Proverbs",3,5],["Romans",8,28],
+  ["Philippians",4,13],["Isaiah",40,31],["Matthew",11,28],["Joshua",1,9],
+  ["Jeremiah",29,11],["Romans",8,38],["Psalms",46,1],["John",14,6],
+  ["Proverbs",22,6],["Matthew",5,3],["Revelation",21,4],["Psalms",27,1],
+  ["John",10,10],["Romans",12,2],["Galatians",5,22],["Hebrews",11,1],
+];
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════ */
+const S = {
   testament: 'OT',
-  book: 'Genesis',
-  chapter: 1,
-  bookData: null,
-  fontSize: 17,
-  bookmarks: [],     // [{book,chapter,verse,text}]
-  highlights: {},    // "Book_C_V": true
-  redLetter: false,
+  book: 'John',
+  chapter: 3,
+  fontSize: 18,
+  mode: 'default',
+  lang: 'both',
+  bookmarks: [],
+  highlights: {},
 };
+const CACHE_EN = {};      // book → {chapters:[{chapter,verses:[{verse,text}]}]}
+let YORUBA_DATA = null;   // parsed Yoruba JSON (loaded once)
+let YO_INDEX = {};        // bookName → { chapter → { verse → text } }
+let REDLETTER = {};       // book → [[chapVerses]]
+let yorubaLoading = false;
+let redletterReady = false;
+let activeVerse = null;
+let searchScope = 'all';
+let searchTimer, toastTimer, pressTimer;
 
-const cache = {};  // book name → parsed JSON
-
-// ── PERSISTENCE ───────────────────────────────────────────────
-function loadPrefs() {
+/* ══════════════════════════════════════════════════════════════
+   PERSISTENCE
+   ══════════════════════════════════════════════════════════════ */
+function persist(){
+  try { localStorage.setItem('bibeli_v2', JSON.stringify({
+    book:S.book, chapter:S.chapter, testament:S.testament,
+    fontSize:S.fontSize, mode:S.mode, lang:S.lang,
+    bookmarks:S.bookmarks, highlights:S.highlights
+  })); } catch(e){}
+}
+function restore(){
   try {
-    const s = JSON.parse(localStorage.getItem('kjv_state') || '{}');
-    if (s.book)       state.book      = s.book;
-    if (s.chapter)    state.chapter   = s.chapter;
-    if (s.testament)  state.testament = s.testament;
-    if (s.fontSize)   state.fontSize  = s.fontSize;
-    if (s.bookmarks)  state.bookmarks = s.bookmarks;
-    if (s.highlights) state.highlights= s.highlights;
-    if (s.redLetter !== undefined) state.redLetter = s.redLetter;
-  } catch(e) {}
-}
-function savePrefs() {
-  localStorage.setItem('kjv_state', JSON.stringify({
-    book: state.book, chapter: state.chapter, testament: state.testament,
-    fontSize: state.fontSize, bookmarks: state.bookmarks,
-    highlights: state.highlights, redLetter: state.redLetter
-  }));
+    const d = JSON.parse(localStorage.getItem('bibeli_v2')||'{}');
+    if(d.book)       S.book      = d.book;
+    if(d.chapter)    S.chapter   = d.chapter;
+    if(d.testament)  S.testament = d.testament;
+    if(d.fontSize)   S.fontSize  = d.fontSize;
+    if(d.mode)       S.mode      = d.mode;
+    if(d.lang)       S.lang      = d.lang;
+    if(d.bookmarks)  S.bookmarks = d.bookmarks;
+    if(d.highlights) S.highlights= d.highlights;
+  } catch(e){}
 }
 
-// ── FETCH BOOK ────────────────────────────────────────────────
-async function fetchBook(name) {
-  if (cache[name]) return cache[name];
-  const url = BASE + encodeURIComponent(name.replace(/ /g,'')) + '.json';
+/* ══════════════════════════════════════════════════════════════
+   FETCH HELPERS
+   ══════════════════════════════════════════════════════════════ */
+async function fetchEN(name){
+  if(CACHE_EN[name]) return CACHE_EN[name];
+  const url = BASE_EN + name.replace(/ /g,'') + '.json';
   const r = await fetch(url);
-  if (!r.ok) throw new Error('Network error');
-  const data = await r.json();
-  cache[name] = data;
-  return data;
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const d = await r.json();
+  CACHE_EN[name] = d;
+  return d;
 }
 
-// ── INIT ──────────────────────────────────────────────────────
-async function init() {
-  loadPrefs();
+async function ensureYoruba(){
+  if(YO_INDEX && Object.keys(YO_INDEX).length) return;
+  if(yorubaLoading) { await new Promise(r => setTimeout(r, 150)); return ensureYoruba(); }
+  yorubaLoading = true;
+  try {
+    const r = await fetch(YORUBA_URL);
+    const data = await r.json();
+    // Index: bookIdx → chapter → verse → text
+    data.forEach((book, bi) => {
+      const idx = {};
+      book.details.forEach(v => {
+        if(!idx[v.chapter]) idx[v.chapter] = {};
+        idx[v.chapter][v.verse] = v.text.replace(/^[\s⓪-⓿ⓐ-ⓩ]+/,'').trim();
+      });
+      YO_INDEX[bi] = idx;
+    });
+  } catch(e){ console.warn('Yoruba load failed:', e) }
+  yorubaLoading = false;
+}
+
+async function ensureRedletter(){
+  if(redletterReady) return;
+  try {
+    const r = await fetch(REDLETTER_URL);
+    REDLETTER = await r.json();
+    redletterReady = true;
+  } catch(e){ console.warn('Red-letter load failed:', e) }
+}
+
+function getYoVerse(bookIdx, chapter, verse){
+  return YO_INDEX[bookIdx]?.[chapter]?.[verse] || '';
+}
+function isRedLetter(book, chapter, verse){
+  const chaps = REDLETTER[book];
+  if(!chaps) return false;
+  const vv = chaps[chapter-1];
+  return Array.isArray(vv) && vv.includes(verse);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════ */
+async function init(){
+  restore();
+  applyMode(S.mode, false);
+  applyLang(S.lang, false);
+  applyFont(S.fontSize, false);
   registerSW();
   buildBookList();
-  setFontSize(state.fontSize);
+
+  // Load redletter + yoruba in parallel, non-blocking
+  ensureRedletter();
+  ensureYoruba();
+
   try {
-    await loadBook(state.book, state.chapter);
-    document.getElementById('loading').classList.add('hidden');
-  } catch(e) {
-    document.getElementById('loading-msg').textContent = 'No internet connection. Open a book you visited before.';
-    setTimeout(() => document.getElementById('loading').classList.add('hidden'), 2000);
+    await fetchEN(S.book);
+    document.getElementById('loading').classList.add('gone');
+    showDailySplash();
+  } catch(e){
+    document.getElementById('ld-msg').textContent = 'No internet. Visit chapters first to cache them.';
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('gone');
+      document.getElementById('daily-splash').classList.add('gone');
+      openChapter(S.book, S.chapter);
+    }, 2000);
   }
 }
 
-// ── SERVICE WORKER ────────────────────────────────────────────
-function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+function registerSW(){
+  if('serviceWorker' in navigator)
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DAILY VERSE SPLASH
+   ══════════════════════════════════════════════════════════════ */
+async function showDailySplash(){
+  const today = new Date();
+  const dayIdx = Math.floor(today.getTime()/(1000*60*60*24)) % DAILY_POOL.length;
+  const [book, chap, verse] = DAILY_POOL[dayIdx];
+  const bookIdx = ALL.indexOf(book);
+
+  document.getElementById('splash-date').textContent =
+    today.toLocaleDateString('en-NG', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  try {
+    const data = await fetchEN(book);
+    const chapData = data.chapters[chap-1];
+    const v = chapData.verses[verse-1];
+    document.getElementById('splash-verse-en').textContent = `"${v.text}"`;
+    document.getElementById('splash-ref').textContent = `${book} ${chap}:${verse} · KJV`;
+
+    await ensureYoruba();
+    const yo = getYoVerse(bookIdx, chap, verse);
+    document.getElementById('splash-verse-yo').textContent = yo ? `"${yo}"` : '';
+  } catch(e){
+    enterApp();
   }
 }
 
-// ── BOOK LIST ─────────────────────────────────────────────────
-function buildBookList() {
-  const list = document.getElementById('book-list');
-  const books = state.testament === 'OT' ? OT_BOOKS : NT_BOOKS;
-  list.innerHTML = '';
-  books.forEach((b, i) => {
-    const el = document.createElement('div');
-    el.className = 'book-item' + (b === state.book ? ' active' : '');
-    el.innerHTML = `<span>${b}</span><span class="book-abbr">${ABBR[b]}</span>`;
-    el.onclick = () => { loadBook(b, 1); closeSidebar(); };
-    list.appendChild(el);
-  });
+function enterApp(){
+  document.getElementById('daily-splash').classList.add('gone');
+  openChapter(S.book, S.chapter);
 }
 
-function switchTestament(t, btn) {
-  state.testament = t;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+/* ══════════════════════════════════════════════════════════════
+   BOOK LIST
+   ══════════════════════════════════════════════════════════════ */
+function buildBookList(filter=''){
+  const el = document.getElementById('book-list');
+  const books = S.testament==='OT' ? OT : NT;
+  const fl = filter.toLowerCase();
+  el.innerHTML = '';
+  books.filter(b => !fl || b.toLowerCase().includes(fl) || (ABBR[b]||'').toLowerCase().includes(fl))
+    .forEach((b,i) => {
+      const div = document.createElement('div');
+      div.className = 'book-item' + (b===S.book ? ' on' : '');
+      const num = (S.testament==='OT' ? OT : NT).indexOf(b)+1;
+      div.innerHTML = `<span class="bk-num">${num}</span><span>${b}</span>`;
+      div.onclick = () => { openChapter(b,1); closeSidebar() };
+      el.appendChild(div);
+    });
+}
+function filterBooks(v){ buildBookList(v) }
+
+function switchT(t, btn){
+  S.testament = t;
+  document.querySelectorAll('.t-tab').forEach(b => b.classList.toggle('on', b===btn));
+  document.getElementById('sb-filter').value = '';
   buildBookList();
 }
 
-// ── LOAD BOOK / CHAPTER ───────────────────────────────────────
-async function loadBook(name, chap) {
-  document.getElementById('loading-msg').textContent = `Loading ${name}…`;
-  document.getElementById('loading').classList.remove('hidden');
+/* ══════════════════════════════════════════════════════════════
+   OPEN CHAPTER
+   ══════════════════════════════════════════════════════════════ */
+async function openChapter(book, chap){
+  S.book = book; S.chapter = chap;
+  const bookIdx = ALL.indexOf(book);
+
+  // Sync testament tab
+  const inNT = NT.includes(book);
+  S.testament = inNT ? 'NT' : 'OT';
+  document.querySelectorAll('.t-tab').forEach(b =>
+    b.classList.toggle('on', b.dataset.t === S.testament));
+  buildBookList();
+  buildChapStrip(book, chap);
+
+  document.getElementById('loc-book').textContent = book;
+  document.getElementById('loc-chap').textContent = `Ch. ${chap}`;
+  document.getElementById('chap-hero-book').textContent = book;
+  document.getElementById('chap-hero-ref').textContent = `Chapter ${chap} · King James Version`;
+  document.getElementById('chap-dropcap').textContent = chap;
+
+  renderSkeleton();
+  persist();
+
   try {
-    const data = await fetchBook(name);
-    state.book = name;
-    state.bookData = data;
-    // Ensure testament tab matches
-    if (NT_BOOKS.includes(name) && state.testament !== 'NT') {
-      state.testament = 'NT';
-      document.querySelectorAll('.tab-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.t === 'NT'));
-    } else if (OT_BOOKS.includes(name) && state.testament !== 'OT') {
-      state.testament = 'OT';
-      document.querySelectorAll('.tab-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.t === 'OT'));
-    }
-    buildBookList();
-    renderChapterNav(data, chap);
-    renderChapter(data, chap);
-    savePrefs();
-  } catch(e) {
-    showToast('Could not load ' + name + '. Check connection.');
+    const [enData] = await Promise.all([
+      fetchEN(book),
+      ensureYoruba(),
+      ensureRedletter()
+    ]);
+    const chapData = enData.chapters[chap-1];
+    renderVerses(chapData.verses, book, chap, bookIdx);
+  } catch(e){
+    document.getElementById('verses').innerHTML =
+      `<div style="padding:28px;text-align:center;color:var(--text-dim);font-family:var(--font-display);font-size:16px">
+        Could not load ${book} ${chap}.<br>Please check your connection.
+       </div>`;
   }
-  document.getElementById('loading').classList.add('hidden');
 }
 
-// ── CHAPTER NAV ───────────────────────────────────────────────
-function renderChapterNav(data, active) {
-  const nav = document.getElementById('chapter-nav');
-  nav.innerHTML = '';
-  data.chapters.forEach((c, i) => {
-    const n = i + 1;
+/* ══════════════════════════════════════════════════════════════
+   CHAPTER STRIP
+   ══════════════════════════════════════════════════════════════ */
+function buildChapStrip(book, active){
+  const total = CHAPS[book] || 1;
+  const wrap = document.getElementById('strip-btns');
+  wrap.innerHTML = '';
+  for(let n=1; n<=total; n++){
     const btn = document.createElement('button');
-    btn.className = 'chap-btn' + (n === active ? ' active' : '');
+    btn.className = 'cb' + (n===active ? ' on' : '');
     btn.textContent = n;
-    btn.onclick = () => gotoChapter(n);
-    nav.appendChild(btn);
-  });
-  // scroll active into view
-  const active_el = nav.querySelector('.chap-btn.active');
-  if (active_el) active_el.scrollIntoView({inline:'center', block:'nearest'});
-}
-
-function gotoChapter(n) {
-  renderChapterNav(state.bookData, n);
-  renderChapter(state.bookData, n);
-  savePrefs();
-}
-
-function changeChapter(delta) {
-  if (!state.bookData) return;
-  const total = state.bookData.chapters.length;
-  const n = state.chapter + delta;
-  if (n < 1) {
-    // go to prev book
-    const idx = ALL_BOOKS.indexOf(state.book);
-    if (idx > 0) loadBook(ALL_BOOKS[idx - 1], 999);
-    return;
+    btn.onclick = (c => ()=>openChapter(book,c))(n);
+    wrap.appendChild(btn);
   }
-  if (n > total) {
-    const idx = ALL_BOOKS.indexOf(state.book);
-    if (idx < ALL_BOOKS.length - 1) loadBook(ALL_BOOKS[idx + 1], 1);
-    return;
-  }
-  gotoChapter(n);
+  wrap.querySelector('.cb.on')?.scrollIntoView({inline:'center', block:'nearest'});
+
+  const bi = ALL.indexOf(book);
+  const dis_prev = active===1 && bi===0;
+  const dis_next = active===total && bi===ALL.length-1;
+  ['pa','pa2'].forEach(id => document.getElementById(id).disabled = dis_prev);
+  ['na','na2'].forEach(id => document.getElementById(id).disabled = dis_next);
 }
 
-// ── RENDER CHAPTER ────────────────────────────────────────────
-function renderChapter(data, chapNum) {
-  // clamp
-  chapNum = Math.max(1, Math.min(chapNum, data.chapters.length));
-  state.chapter = chapNum;
+function shiftChap(d){
+  const total = CHAPS[S.book]||1;
+  const n = S.chapter + d;
+  if(n<1){
+    const i = ALL.indexOf(S.book);
+    if(i>0) openChapter(ALL[i-1], CHAPS[ALL[i-1]]);
+  } else if(n>total){
+    const i = ALL.indexOf(S.book);
+    if(i<ALL.length-1) openChapter(ALL[i+1], 1);
+  } else { openChapter(S.book, n) }
+}
 
-  const chapData = data.chapters[chapNum - 1];
-  const verses = chapData.verses;
+/* ══════════════════════════════════════════════════════════════
+   SKELETON
+   ══════════════════════════════════════════════════════════════ */
+function renderSkeleton(){
+  const c = document.getElementById('verses');
+  c.innerHTML = '';
+  for(let i=0; i<14; i++){
+    const w1 = 55+Math.random()*40, w2 = 45+Math.random()*45;
+    c.innerHTML += `
+      <div class="vpair" style="padding:6px 8px">
+        <div class="skel" style="width:${w1}%;height:18px;margin-bottom:6px"></div>
+        <div class="skel" style="width:${w2}%;height:14px;opacity:.6"></div>
+      </div>`;
+  }
+  document.getElementById('reader').scrollTo(0,0);
+}
 
-  document.getElementById('current-book').textContent = state.book;
-  document.getElementById('current-chap').textContent = `Chapter ${chapNum}`;
-  document.getElementById('chapter-heading').textContent =
-    `${state.book}  ·  Chapter ${chapNum}`;
-
-  // nav arrows
-  const totalChaps = data.chapters.length;
-  const bookIdx = ALL_BOOKS.indexOf(state.book);
-  document.getElementById('prev-chap').disabled = chapNum === 1 && bookIdx === 0;
-  document.getElementById('next-chap').disabled = chapNum === totalChaps && bookIdx === ALL_BOOKS.length - 1;
-
-  const container = document.getElementById('verses');
-  container.innerHTML = '';
+/* ══════════════════════════════════════════════════════════════
+   RENDER VERSES
+   ══════════════════════════════════════════════════════════════ */
+function renderVerses(verses, book, chap, bookIdx){
+  const c = document.getElementById('verses');
+  c.innerHTML = '';
 
   verses.forEach(v => {
     const vn = parseInt(v.verse);
-    const key = `${state.book}_${chapNum}_${vn}`;
-    const isHL = !!state.highlights[key];
-    const isBM = state.bookmarks.some(b => b.book===state.book && b.chapter===chapNum && b.verse===vn);
+    const key = `${book}_${chap}_${vn}`;
+    const isHL = !!S.highlights[key];
+    const isBM = S.bookmarks.some(b => b.book===book && b.chapter===chap && b.verse===vn);
+    const isJesus = isRedLetter(book, chap, vn);
+    const yo = getYoVerse(bookIdx, chap, vn);
 
-    const row = document.createElement('div');
-    row.className = 'verse-row' + (isHL ? ' highlighted' : '') + (isBM ? ' bookmarked' : '');
-    row.dataset.v = vn;
-    row.dataset.key = key;
+    const pair = document.createElement('div');
+    pair.className = 'vpair' + (isHL?' hl':'') + (isBM?' bm':'');
+    pair.dataset.v = vn; pair.dataset.key = key;
+    pair.dataset.en = v.text; pair.dataset.yo = yo;
 
-    const numEl = document.createElement('span');
-    numEl.className = 'verse-num';
-    numEl.textContent = vn;
+    pair.innerHTML = `
+      <div class="en-row">
+        <span class="vnum">${vn}</span>
+        <span class="en-text${isJesus?' jesus':''}">${v.text}</span>
+      </div>
+      <div class="yo-row">
+        <span class="yo-spacer"></span>
+        <span class="yo-text">${yo || '<em style="opacity:.4">—</em>'}</span>
+      </div>`;
 
-    const textEl = document.createElement('span');
-    textEl.className = 'verse-text';
-    textEl.textContent = v.text;
-
-    row.appendChild(numEl);
-    row.appendChild(textEl);
-
-    row.onclick = () => verseAction(row, vn, v.text);
-    container.appendChild(row);
+    c.appendChild(pair);
   });
 
-  // scroll to top
-  document.getElementById('reader').scrollTo(0, 0);
+  // Reading progress
+  setupProgress();
+  document.getElementById('reader').scrollTo(0,0);
 }
 
-// ── VERSE ACTIONS ─────────────────────────────────────────────
-function verseAction(row, vn, text) {
-  const key = row.dataset.key;
-  // toggle highlight
-  if (state.highlights[key]) {
-    delete state.highlights[key];
-    row.classList.remove('highlighted');
-  } else {
-    state.highlights[key] = true;
-    row.classList.add('highlighted');
+/* ══════════════════════════════════════════════════════════════
+   READING PROGRESS
+   ══════════════════════════════════════════════════════════════ */
+function setupProgress(){
+  const reader = document.getElementById('reader');
+  const fill = document.getElementById('progress-fill');
+  reader.onscroll = () => {
+    const max = reader.scrollHeight - reader.clientHeight;
+    fill.style.width = max > 0 ? (reader.scrollTop/max*100)+'%' : '0%';
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VERSE CONTEXT MENU
+   ══════════════════════════════════════════════════════════════ */
+const versesEl = document.getElementById('verses');
+versesEl.addEventListener('pointerdown', e => {
+  const pair = e.target.closest('.vpair');
+  if(!pair) return;
+  pressTimer = setTimeout(() => showVMenu(pair, e.clientX, e.clientY), 480);
+});
+versesEl.addEventListener('pointerup',    () => clearTimeout(pressTimer));
+versesEl.addEventListener('pointercancel',() => clearTimeout(pressTimer));
+versesEl.addEventListener('contextmenu', e => {
+  const pair = e.target.closest('.vpair');
+  if(!pair) return;
+  e.preventDefault();
+  showVMenu(pair, e.clientX, e.clientY);
+});
+
+function showVMenu(pair, x, y){
+  activeVerse = pair;
+  const vn = pair.dataset.v;
+  const key = pair.dataset.key;
+  const isBM = S.bookmarks.some(b=>b.book===S.book&&b.chapter===S.chapter&&b.verse==vn);
+  const isHL = !!S.highlights[key];
+  document.getElementById('vmenu-ref').textContent = `${S.book} ${S.chapter}:${vn}`;
+  document.getElementById('vm-bm-lbl').textContent = isBM ? 'Remove bookmark' : 'Add bookmark';
+  document.getElementById('vm-hl-lbl').textContent = isHL ? 'Remove highlight' : 'Highlight verse';
+  const menu = document.getElementById('vmenu');
+  menu.classList.add('on');
+  const mw=188, mh=140;
+  menu.style.left = Math.min(x, window.innerWidth-mw-8)+'px';
+  menu.style.top  = Math.min(y, window.innerHeight-mh-8)+'px';
+  document.getElementById('overlay').classList.add('on');
+}
+function closeVMenu(){
+  document.getElementById('vmenu').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
+  activeVerse = null;
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('#vmenu') && !e.target.closest('.vpair')) closeVMenu();
+});
+
+function vmCopy(){
+  if(!activeVerse) return;
+  const vn=activeVerse.dataset.v, en=activeVerse.dataset.en, yo=activeVerse.dataset.yo;
+  const text = `"${en}"\n${yo ? '「'+yo+'」\n' : ''}— ${S.book} ${S.chapter}:${vn} (KJV)`;
+  navigator.clipboard?.writeText(text).then(()=>toast('Verse copied ✓'));
+  closeVMenu();
+}
+function vmBM(){
+  if(!activeVerse) return;
+  const vn=parseInt(activeVerse.dataset.v);
+  const en=activeVerse.dataset.en, yo=activeVerse.dataset.yo;
+  toggleBM(S.book, S.chapter, vn, en, yo);
+  closeVMenu();
+}
+function vmHL(){
+  if(!activeVerse) return;
+  const key=activeVerse.dataset.key;
+  if(S.highlights[key]){ delete S.highlights[key]; activeVerse.classList.remove('hl'); toast('Highlight removed') }
+  else { S.highlights[key]=true; activeVerse.classList.add('hl'); toast('Verse highlighted ✨') }
+  persist(); closeVMenu();
+}
+function vmShare(){
+  if(!activeVerse) return;
+  const vn=activeVerse.dataset.v, en=activeVerse.dataset.en;
+  const text = `"${en}" — ${S.book} ${S.chapter}:${vn} (KJV)`;
+  if(navigator.share) navigator.share({title:'Bibeli Mimọ', text});
+  else { navigator.clipboard?.writeText(text); toast('Copied for sharing ✓') }
+  closeVMenu();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOOKMARKS
+   ══════════════════════════════════════════════════════════════ */
+function toggleBM(book, chap, verse, en, yo){
+  const idx = S.bookmarks.findIndex(b=>b.book===book&&b.chapter===chap&&b.verse===verse);
+  if(idx>=0){ S.bookmarks.splice(idx,1); toast('Bookmark removed'); }
+  else { S.bookmarks.unshift({book,chapter:chap,verse,en:en.slice(0,100),yo:(yo||'').slice(0,80)}); toast('Bookmarked 🔖'); }
+  persist();
+  const pair = document.querySelector(`.vpair[data-v="${verse}"]`);
+  if(pair){
+    const isBM = S.bookmarks.some(b=>b.book===book&&b.chapter===chap&&b.verse===verse);
+    pair.classList.toggle('bm', isBM);
   }
-  // show context menu via toast
-  const ref = `${state.book} ${state.chapter}:${vn}`;
-  showVerseMenu(row, vn, text, key, ref);
-  savePrefs();
 }
-
-function showVerseMenu(row, vn, text, key, ref) {
-  // simple: show toast with copy + bookmark
-  const isBM = state.bookmarks.some(b => b.book===state.book && b.chapter===state.chapter && b.verse===vn);
-  const msg = isBM ? `${ref} — Bookmark removed` : `${ref} — Highlighted`;
-  showToast(msg);
-}
-
-// ── BOOKMARKS ─────────────────────────────────────────────────
-function toggleBookmark(book, chapter, verse, text) {
-  const idx = state.bookmarks.findIndex(b =>
-    b.book===book && b.chapter===chapter && b.verse===verse);
-  if (idx >= 0) {
-    state.bookmarks.splice(idx, 1);
-    showToast('Bookmark removed');
-  } else {
-    state.bookmarks.unshift({book, chapter, verse, text: text.slice(0,80)});
-    showToast('Bookmark added');
-  }
-  savePrefs();
-  renderChapter(state.bookData, state.chapter);
-}
-
-function openBookmarks() {
-  const panel = document.getElementById('bm-panel');
-  panel.classList.add('open');
-  renderBMList();
-}
-function closeBookmarks() {
-  document.getElementById('bm-panel').classList.remove('open');
-}
-function renderBMList() {
-  const list = document.getElementById('bm-list');
-  if (!state.bookmarks.length) {
-    list.innerHTML = '<div id="bm-empty">No bookmarks yet.<br>Tap a verse then long-press to bookmark.</div>';
+function openBM(){ document.getElementById('bp').classList.add('on'); renderBMList() }
+function closeBM(){ document.getElementById('bp').classList.remove('on') }
+function renderBMList(){
+  const list = document.getElementById('bp-list');
+  if(!S.bookmarks.length){
+    list.innerHTML = '<div class="panel-empty">No bookmarks yet.<br><br>Long-press or right-click any verse to bookmark it.</div>';
     return;
   }
   list.innerHTML = '';
-  state.bookmarks.forEach((bm, i) => {
-    const row = document.createElement('div');
-    row.className = 'bm-item';
-    row.innerHTML = `
+  S.bookmarks.forEach((bm,i) => {
+    const div = document.createElement('div');
+    div.className = 'bm-item';
+    div.innerHTML = `
       <div class="bm-ref">${bm.book} ${bm.chapter}:${bm.verse}</div>
-      <div class="bm-text">${bm.text}</div>
-      <button class="bm-del icon-btn" title="Remove">✕</button>
-    `;
-    row.querySelector('.bm-del').onclick = e => {
-      e.stopPropagation();
-      state.bookmarks.splice(i, 1);
-      savePrefs();
-      renderBMList();
+      <div class="bm-body">
+        <div class="bm-en">${bm.en}</div>
+        ${bm.yo ? `<div class="bm-yo">${bm.yo}</div>` : ''}
+      </div>
+      <button class="bm-del ibtn" title="Remove">✕</button>`;
+    div.querySelector('.bm-del').onclick = e => {
+      e.stopPropagation(); S.bookmarks.splice(i,1); persist(); renderBMList();
     };
-    row.onclick = () => {
-      closeBookmarks();
-      if (bm.book !== state.book) {
-        loadBook(bm.book, bm.chapter);
-      } else {
-        gotoChapter(bm.chapter);
-        // scroll to verse
+    div.onclick = () => {
+      closeBM();
+      openChapter(bm.book, bm.chapter).then(() => {
         setTimeout(() => {
-          const el = document.querySelector(`.verse-row[data-v="${bm.verse}"]`);
-          if (el) el.scrollIntoView({block:'center', behavior:'smooth'});
-        }, 200);
-      }
+          document.querySelector(`.vpair[data-v="${bm.verse}"]`)
+            ?.scrollIntoView({block:'center', behavior:'smooth'});
+        }, 300);
+      });
     };
-    list.appendChild(row);
+    list.appendChild(div);
   });
 }
 
-// Verse long-press → bookmark (also double-click on desktop)
-let pressTimer;
-document.getElementById('verses').addEventListener('pointerdown', e => {
-  const row = e.target.closest('.verse-row');
-  if (!row) return;
-  pressTimer = setTimeout(() => {
-    const vn = parseInt(row.dataset.v);
-    const text = row.querySelector('.verse-text').textContent;
-    toggleBookmark(state.book, state.chapter, vn, text);
-  }, 500);
-});
-document.getElementById('verses').addEventListener('pointerup', () => clearTimeout(pressTimer));
-document.getElementById('verses').addEventListener('pointerleave', () => clearTimeout(pressTimer));
-
-// ── SEARCH ────────────────────────────────────────────────────
-let searchCache = {};  // book → verses array
-let searchDebounce;
-
-function openSearch() {
-  document.getElementById('search-panel').classList.add('open');
-  setTimeout(() => document.getElementById('search-input').focus(), 100);
+/* ══════════════════════════════════════════════════════════════
+   SEARCH
+   ══════════════════════════════════════════════════════════════ */
+function openSearch(){
+  document.getElementById('sp').classList.add('on');
+  document.getElementById('scope-book-btn').textContent = S.book;
+  setTimeout(()=>document.getElementById('sp-in').focus(), 80);
 }
-function closeSearch() {
-  document.getElementById('search-panel').classList.remove('open');
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-results').innerHTML = '';
-  document.getElementById('search-status').textContent = '';
+function closeSearch(){
+  document.getElementById('sp').classList.remove('on');
+  document.getElementById('sp-in').value='';
+  document.getElementById('sp-results').innerHTML='';
+  document.getElementById('sp-status').textContent='';
 }
-
-document.getElementById('search-input').addEventListener('input', e => {
-  clearTimeout(searchDebounce);
+function setScope(btn){
+  document.querySelectorAll('.scope-pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  searchScope = btn.dataset.scope;
+}
+document.getElementById('sp-in').addEventListener('input', e => {
+  clearTimeout(searchTimer);
   const q = e.target.value.trim();
-  if (q.length < 3) {
-    document.getElementById('search-results').innerHTML = '';
-    document.getElementById('search-status').textContent =
-      q.length ? 'Type at least 3 characters…' : '';
+  if(q.length<3){
+    document.getElementById('sp-results').innerHTML='';
+    document.getElementById('sp-status').textContent = q?'Type at least 3 characters…':'';
     return;
   }
-  document.getElementById('search-status').textContent = 'Searching…';
-  searchDebounce = setTimeout(() => doSearch(q), 350);
+  document.getElementById('sp-status').textContent = 'Searching cached chapters…';
+  searchTimer = setTimeout(()=>doSearch(q), 350);
 });
 
-async function doSearch(q) {
-  const ql = q.toLowerCase();
-  const results = [];
+async function doSearch(q){
+  const ql=q.toLowerCase();
+  let scope = ALL;
+  if(searchScope==='OT') scope=OT;
+  else if(searchScope==='NT') scope=NT;
+  else if(searchScope==='book') scope=[S.book];
+  const results=[];
 
-  // Search already-cached books first, then try to load others
-  // For performance: search cached books, then up to 10 more
-  const toSearch = [...ALL_BOOKS];
-  let loaded = 0;
-
-  for (const book of toSearch) {
-    if (results.length >= 60) break;
-    try {
-      const data = cache[book] || await fetchBook(book);
-      for (const chap of data.chapters) {
-        for (const v of chap.verses) {
-          if (v.text.toLowerCase().includes(ql)) {
-            results.push({book, chapter:+chap.chapter, verse:+v.verse, text:v.text});
-            if (results.length >= 60) break;
+  for(const book of scope){
+    if(results.length>=80) break;
+    const bi = ALL.indexOf(book);
+    for(const [bk, data] of Object.entries(CACHE_EN)){
+      if(bk!==book) continue;
+      for(const chap of data.chapters){
+        if(results.length>=80) break;
+        const cn = parseInt(chap.chapter);
+        for(const v of chap.verses){
+          if(v.text.toLowerCase().includes(ql)){
+            const yo = getYoVerse(bi, cn, parseInt(v.verse));
+            results.push({book,chapter:cn,verse:parseInt(v.verse),en:v.text,yo});
+            if(results.length>=80) break;
           }
         }
-        if (results.length >= 60) break;
       }
-    } catch(e) {
-      // skip uncached books when offline
     }
-    loaded++;
-    if (loaded % 5 === 0) {
-      document.getElementById('search-status').textContent =
-        `Searching… (${loaded}/${toSearch.length} books)`;
-      await new Promise(r => setTimeout(r, 0));
-    }
+    await new Promise(r=>setTimeout(r,0));
   }
 
-  renderSearchResults(results, q);
+  // If searching current book and not cached, fetch it
+  if(!results.length && (searchScope==='book'||searchScope==='all')){
+    try {
+      const data = await fetchEN(S.book);
+      const bi = ALL.indexOf(S.book);
+      for(const chap of data.chapters){
+        const cn=parseInt(chap.chapter);
+        for(const v of chap.verses){
+          if(v.text.toLowerCase().includes(ql)){
+            const yo=getYoVerse(bi,cn,parseInt(v.verse));
+            results.push({book:S.book,chapter:cn,verse:parseInt(v.verse),en:v.text,yo});
+          }
+        }
+      }
+    } catch(e){}
+  }
+
+  renderSearchResults(results,q);
 }
 
-function renderSearchResults(results, q) {
-  const el = document.getElementById('search-results');
-  const status = document.getElementById('search-status');
-  if (!results.length) {
-    el.innerHTML = '';
-    status.textContent = 'No results found.';
-    return;
-  }
-  status.textContent = `${results.length}${results.length>=60?'+':''} result${results.length!==1?'s':''}`;
-  el.innerHTML = '';
-  results.forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'search-result';
-    const hl = r.text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
-      '<mark>$1</mark>');
-    div.innerHTML = `<div class="search-ref">${r.book} ${r.chapter}:${r.verse}</div>
-                     <div class="search-snippet">${hl}</div>`;
-    div.onclick = () => {
+function renderSearchResults(res,q){
+  const el=document.getElementById('sp-results'), st=document.getElementById('sp-status');
+  if(!res.length){ el.innerHTML=''; st.textContent='No results found in cached books.'; return; }
+  st.textContent=`${res.length}${res.length>=80?'+':''} result${res.length!==1?'s':''}`;
+  el.innerHTML='';
+  const re=new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi');
+  res.forEach(r=>{
+    const div=document.createElement('div');
+    div.className='sresult';
+    div.innerHTML=`<div class="sresult-ref">${r.book} ${r.chapter}:${r.verse}</div>
+      <div class="sresult-en">${r.en.replace(re,'<mark>$1</mark>')}</div>
+      ${r.yo?`<div class="sresult-yo">${r.yo.replace(re,'<mark>$1</mark>')}</div>`:''}`;
+    div.onclick=()=>{
       closeSearch();
-      if (r.book !== state.book) {
-        loadBook(r.book, r.chapter).then(() => {
-          setTimeout(() => {
-            const vEl = document.querySelector(`.verse-row[data-v="${r.verse}"]`);
-            if (vEl) vEl.scrollIntoView({block:'center', behavior:'smooth'});
-          }, 300);
-        });
-      } else {
-        gotoChapter(r.chapter);
-        setTimeout(() => {
-          const vEl = document.querySelector(`.verse-row[data-v="${r.verse}"]`);
-          if (vEl) vEl.scrollIntoView({block:'center', behavior:'smooth'});
-        }, 200);
-      }
+      openChapter(r.book,r.chapter).then(()=>{
+        setTimeout(()=>{
+          document.querySelector(`.vpair[data-v="${r.verse}"]`)
+            ?.scrollIntoView({block:'center',behavior:'smooth'});
+        },300);
+      });
     };
     el.appendChild(div);
   });
 }
 
-// Close search on panel bg click
-document.getElementById('search-panel').addEventListener('click', e => {
-  if (e.target === document.getElementById('search-panel')) closeSearch();
-});
-document.getElementById('bm-panel').addEventListener('click', e => {
-  if (e.target === document.getElementById('bm-panel')) closeBookmarks();
-});
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS
+   ══════════════════════════════════════════════════════════════ */
+function openSettings(){ document.getElementById('settingsp').classList.add('on') }
+function closeSettings(){ document.getElementById('settingsp').classList.remove('on') }
 
-// ── FONT SIZE ─────────────────────────────────────────────────
-function setFontSize(n) {
-  state.fontSize = Math.max(12, Math.min(26, n));
-  document.querySelectorAll('.verse-text').forEach(el => el.style.fontSize = state.fontSize + 'px');
-  document.getElementById('fs-val').textContent = state.fontSize;
-  document.documentElement.style.setProperty('--verse-fs', state.fontSize + 'px');
-}
-function changeFontSize(delta) {
-  setFontSize(state.fontSize + delta);
-  savePrefs();
-}
-function toggleFontPanel() {
-  document.getElementById('font-panel').classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('#font-panel') && !e.target.closest('.icon-btn[onclick*="Font"]')) {
-    document.getElementById('font-panel').classList.remove('open');
+function setMode(m, btn){
+  if(typeof btn === 'string'){ // called from UI button element
+    document.querySelectorAll('.mode-card').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  } else if(btn){
+    document.querySelectorAll('.mode-card').forEach(b=>b.classList.toggle('on',b===btn));
   }
-});
-
-// ── SIDEBAR MOBILE ────────────────────────────────────────────
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('hidden');
+  applyMode(m); persist();
 }
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.add('hidden');
+function applyMode(m, save=true){
+  S.mode = m;
+  document.body.dataset.mode = m;
+  document.getElementById('theme-meta').content =
+    m==='day' ? '#f5efe0' : m==='night' ? '#06070b' : '#0a0d14';
+  // sync UI if settings is open
+  document.querySelectorAll('.mode-card').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+function changeFont(d){ applyFont(S.fontSize+d); persist() }
+function applyFont(n, _=true){
+  S.fontSize = Math.max(13, Math.min(26, n));
+  document.documentElement.style.setProperty('--fs-en', S.fontSize+'px');
+  document.querySelectorAll('.en-text').forEach(el=>el.style.fontSize=S.fontSize+'px');
+  document.querySelectorAll('.yo-text').forEach(el=>el.style.fontSize=(S.fontSize-3)+'px');
+  document.getElementById('font-val').textContent = S.fontSize;
+  const pct = ((S.fontSize-13)/(26-13))*100;
+  document.getElementById('font-fill').style.width = pct+'%';
+}
+function fontTrackClick(e){
+  const track=document.getElementById('font-track');
+  const r=track.getBoundingClientRect();
+  const pct=(e.clientX-r.left)/r.width;
+  applyFont(Math.round(13+pct*13)); persist();
+}
+
+function setLang(lang, btn){
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b===btn));
+  applyLang(lang); persist();
+}
+function applyLang(lang, _=true){
+  S.lang=lang;
+  document.body.classList.remove('en-only','yo-only');
+  if(lang==='en') document.body.classList.add('en-only');
+  if(lang==='yo') document.body.classList.add('yo-only');
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR / MISC
+   ══════════════════════════════════════════════════════════════ */
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('on');
+  document.getElementById('overlay').classList.toggle('on', sb.classList.contains('on'));
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('on');
+  if(!document.getElementById('vmenu').classList.contains('on'))
+    document.getElementById('overlay').classList.remove('on');
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  toastTimer=setTimeout(()=>t.classList.remove('on'),2400);
 }
 
-// ── KEYBOARD ─────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
+   KEYBOARD
+   ══════════════════════════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeChapter(1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeChapter(-1);
-  if (e.key === 'f' || e.key === '/') { e.preventDefault(); openSearch(); }
-  if (e.key === 'Escape') { closeSearch(); closeBookmarks(); closeSidebar(); }
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') shiftChap(1);
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   shiftChap(-1);
+  if(e.key==='/'||e.key==='f'){ e.preventDefault(); openSearch() }
+  if(e.key==='Escape'){ closeSearch(); closeBM(); closeSettings(); closeSidebar(); closeVMenu() }
+  if(e.key==='1') setMode('default'); 
+  if(e.key==='2') setMode('night');
+  if(e.key==='3') setMode('day');
 });
 
-// ── BOOT ──────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+   ══════════════════════════════════════════════════════════════ */
 init();
 </script>
 </body>
