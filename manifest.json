@@ -1,19 +1,12 @@
 {
-  "name": "Bibeli Mimọ – KJV & Yoruba",
+  "name": "Bibeli Mimọ – Holy Bible",
   "short_name": "Bibeli",
-  "description": "Holy Bible – King James Version with Yoruba parallel text, red-letter edition",
+  "description": "KJV & Yoruba parallel Bible with red-letter words of Jesus",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0a0d14",
-  "theme_color": "#0a0d14",
+  "background_color": "#0d2137",
+  "theme_color": "#0d2137",
   "orientation": "portrait-primary",
   "categories": ["books", "education", "lifestyle"],
-  "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
 }
